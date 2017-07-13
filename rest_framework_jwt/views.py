@@ -2,6 +2,8 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
 from datetime import datetime
+from backend.models import *
+from backend.serializers import *
 
 from .settings import api_settings
 from .serializers import (
@@ -10,6 +12,12 @@ from .serializers import (
 )
 
 jwt_response_payload_handler = api_settings.JWT_RESPONSE_PAYLOAD_HANDLER
+
+jwt_payload_handler_client = api_settings.JWT_PAYLOAD_HANDLER_CLIENT
+#jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+#jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+#jwt_decode_handler = api_settings.JWT_DECODE_HANDLER
+#jwt_get_username_from_payload = api_settings.JWT_PAYLOAD_GET_USERNAME_HANDLER
 
 
 class JSONWebTokenAPIView(APIView):
@@ -70,7 +78,6 @@ class JSONWebTokenAPIView(APIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 class ObtainJSONWebToken(JSONWebTokenAPIView):
     """
     API View that receives a POST with a user's username and password.
@@ -79,14 +86,12 @@ class ObtainJSONWebToken(JSONWebTokenAPIView):
     """
     serializer_class = JSONWebTokenSerializer
 
-
 class VerifyJSONWebToken(JSONWebTokenAPIView):
     """
     API View that checks the veracity of a token, returning the token if it
     is valid.
     """
     serializer_class = VerifyJSONWebTokenSerializer
-
 
 class RefreshJSONWebToken(JSONWebTokenAPIView):
     """
@@ -99,6 +104,60 @@ class RefreshJSONWebToken(JSONWebTokenAPIView):
     serializer_class = RefreshJSONWebTokenSerializer
 
 
+class ObtainUserCLientJSONWebToken(APIView):
+    """
+    API View that receives a POST with a user's username and password.
+
+    Returns a JSON Web Token that can be used for authenticated requests.
+    """
+    def post(self, request, *args, **kwargs):
+        #print (request.data)
+        data = request.data
+        serializer = UserClientLoginSerializer(data=data)
+        #if serializer.is_valid():
+        verified = serializer.validate_post_login(data)
+        if isinstance(verified,Response):
+            return verified
+        #print (serializer.data)
+        user = UserClient.objects.filter(username=data["username"],password=data["password"],applicationId=data["applicationId"])[0]
+        print(user)
+        
+        #payload = jwt_payload_handler_client(user)
+        #print(payload)
+        #token = jwt_encode_handler(payload)
+
+        return Response({"detail":"ok"}, status=status.HTTP_200_OK)
+
+        #    token = serializer.object.get('token')
+        #    response_data = jwt_response_payload_handler(token, user, request)
+        #    response = Response(response_data)
+        #    if api_settings.JWT_AUTH_COOKIE:
+        #        expiration = (datetime.utcnow() +
+        #                      api_settings.JWT_EXPIRATION_DELTA)
+        #        response.set_cookie(api_settings.JWT_AUTH_COOKIE,
+        #                            token,
+        #                            expires=expiration,
+        #                            httponly=True)
+        #    return response
+#
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 obtain_jwt_token = ObtainJSONWebToken.as_view()
 refresh_jwt_token = RefreshJSONWebToken.as_view()
 verify_jwt_token = VerifyJSONWebToken.as_view()
+
+#UserCLient autentication
+obtain_jwt_token_client = ObtainUserCLientJSONWebToken.as_view()
+#refresh_jwt_token_client = RefreshUserCLientJSONWebToken.as_view()
+#verify_jwt_token_client = VerifyUserCLientJSONWebToken.as_view()
+
+#UserKronero autentication
+#obtain_jwt_token_kronero = ObtainUserKroneroJSONWebToken.as_view()
+#refresh_jwt_token_kronero = RefreshUserKroneroJSONWebToken.as_view()
+#verify_jwt_token_kronero = VerifyUserKroneroJSONWebToken.as_view()
+
+#Administrator Autentication
+#obtain_jwt_token_administrator = ObtainAdministratorJSONWebToken.as_view()
+#refresh_jwt_token_administrator = RefreshAdministratorJSONWebToken.as_view()
+#verify_jwt_token_administrator = VerifyAdministratorJSONWebToken.as_view()
