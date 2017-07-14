@@ -28,6 +28,7 @@ def jwt_get_secret_key(payload=None):
         return key
     return api_settings.JWT_SECRET_KEY
 
+
 def jwt_payload_handler(user):
     username_field = get_username_field()
     username = get_username(user)
@@ -133,7 +134,9 @@ def jwt_response_payload_handler(token, user=None, request=None):
         'token': token
     }
 
+######################################################33
 
+#CLIENT
 
 def jwt_payload_handler_client(user):
     #username_field = get_username_field()
@@ -143,26 +146,23 @@ def jwt_payload_handler_client(user):
         '`email` and `user_id`. ',
         DeprecationWarning
     )
-
     payload = {
-        #'user_id': user.pk,
+        'user_id': user.pk,
         'username': user.username,
         'exp': datetime.utcnow() + api_settings.JWT_EXPIRATION_DELTA,
         'email':user.email,
         'password': user.password,
         'name': user.name,
         'document' : user.document,
-        'birthday' : user.birthday,
         'picture' : user.picture,
         'gender' : user.gender,
-        'created' : user.created,
-        'lists': user.lists,
-        'baskets':user.baskets,
-        'applicationId': user.applicationId.id,
-        'is_active': user.is_active
+        'phone' : user.phone,
+        'applicationId': user.applicationId.id
     }
-
-    #payload[username_field] = username
+    if user.birthday != None:
+        payload['birthday'] = str(user.birthday)
+    else:
+        payload['birthday'] = user.birthday
 
     # Include original issued at time for a brand new token,
     # to allow token refresh
@@ -179,29 +179,35 @@ def jwt_payload_handler_client(user):
 
     return payload
 
-"""
+#KRONERO
 
 def jwt_payload_handler_kronero(user):
-    username_field = get_username_field()
-    username = get_username(user)
-
+    #username_field = get_username_field()
+    #username = get_username(user)
     warnings.warn(
         'The following fields will be removed in the future: '
         '`email` and `user_id`. ',
         DeprecationWarning
     )
-
     payload = {
         'user_id': user.pk,
-        'username': username,
-        'exp': datetime.utcnow() + api_settings.JWT_EXPIRATION_DELTA
+        'username': user.username,
+        'exp': datetime.utcnow() + api_settings.JWT_EXPIRATION_DELTA,
+        'email':user.email,
+        'password': user.password,
+        'name': user.name,
+        'document' : user.document,
+        'picture' : user.picture,
+        'gender' : user.gender,
+        'address_line_1' : user.address_line_1,
+        'address_line_2' : user.address_line_2,
+        'phone' : user.phone,
+        'storeId': user.storeId.id
     }
-    if hasattr(user, 'email'):
-        payload['email'] = user.email
-    if isinstance(user.pk, uuid.UUID):
-        payload['user_id'] = str(user.pk)
-
-    payload[username_field] = username
+    if user.birthday != None:
+        payload['birthday'] = str(user.birthday)
+    else:
+        payload['birthday'] = user.birthday
 
     # Include original issued at time for a brand new token,
     # to allow token refresh
@@ -218,28 +224,42 @@ def jwt_payload_handler_kronero(user):
 
     return payload
 
+#ADMINISTRATORS
 
-def jwt_payload_handler_application(user):
-    username_field = get_username_field()
-    username = get_username(user)
-
+def jwt_payload_handler_administrator(user):
+    #username_field = get_username_field()
+    #username = get_username(user)
     warnings.warn(
         'The following fields will be removed in the future: '
         '`email` and `user_id`. ',
         DeprecationWarning
     )
-
     payload = {
         'user_id': user.pk,
-        'username': username,
-        'exp': datetime.utcnow() + api_settings.JWT_EXPIRATION_DELTA
+        'username': user.username,
+        'exp': datetime.utcnow() + api_settings.JWT_EXPIRATION_DELTA,
+        'email':user.email,
+        'password': user.password,
+        'name': user.name,
+        'document' : user.document,
+        'picture' : user.picture,
+        'gender' : user.gender,
+        'address_line_1' : user.address_line_1,
+        'address_line_2' : user.address_line_2,
+        'phone' : user.phone,
+        'role': user.role
     }
-    if hasattr(user, 'email'):
-        payload['email'] = user.email
-    if isinstance(user.pk, uuid.UUID):
-        payload['user_id'] = str(user.pk)
+    if user.birthday != None:
+        payload['birthday'] = str(user.birthday)
+    else:
+        payload['birthday'] = user.birthday
 
-    payload[username_field] = username
+    if user.role == 'Store':
+        payload['storeId'] = user.storeId.id
+    elif user.role == 'Chain':
+        payload['chainId'] = user.chainId.id
+    elif user.role == 'Application':
+        payload['applicationId'] = user.applicationId.id
 
     # Include original issued at time for a brand new token,
     # to allow token refresh
@@ -255,4 +275,3 @@ def jwt_payload_handler_application(user):
         payload['iss'] = api_settings.JWT_ISSUER
 
     return payload
-"""

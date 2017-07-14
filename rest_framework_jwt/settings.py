@@ -16,17 +16,23 @@ DEFAULTS = {
     'JWT_PAYLOAD_HANDLER':
     'rest_framework_jwt.utils.jwt_payload_handler',
 
-    'JWT_PAYLOAD_HANDLER_CLIENT':
+    'JWT_CLIENT_HANDLER': #CLIENT
     'rest_framework_jwt.utils.jwt_payload_handler_client',
+
+    'JWT_KRONERO_HANDLER': #AKRONEROS
+    'rest_framework_jwt.utils.jwt_payload_handler_kronero',
+
+    'JWT_ADMINISTRATOR_HANDLER': #ADMINISTRATORS
+    'rest_framework_jwt.utils.jwt_payload_handler_administrator',
 
     'JWT_PAYLOAD_GET_USER_ID_HANDLER':
     'rest_framework_jwt.utils.jwt_get_user_id_from_payload_handler',
 
     'JWT_PRIVATE_KEY':
-    'krono',
+    'Kr0n0M4rk3tB4ck3nd',
 
     'JWT_PUBLIC_KEY':
-    'krono',
+    'Kr0n0M4rk3tB4ck3nd',
 
     'JWT_PAYLOAD_GET_USERNAME_HANDLER':
     'rest_framework_jwt.utils.jwt_get_username_from_payload_handler',
@@ -44,7 +50,7 @@ DEFAULTS = {
     'JWT_AUDIENCE': None,
     'JWT_ISSUER': None,
 
-    'JWT_ALLOW_REFRESH': True,
+    'JWT_ALLOW_REFRESH': True, #SET TRUE
     'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
 
     'JWT_AUTH_HEADER_PREFIX': 'JWT',
@@ -53,9 +59,12 @@ DEFAULTS = {
 
 # List of settings that may be in string import notation.
 IMPORT_STRINGS = (
-    'JWT_ENCODE_HANDLER',
+    'JWT_ENCODE_HANDLER', 
     'JWT_DECODE_HANDLER',
     'JWT_PAYLOAD_HANDLER',
+    'JWT_CLIENT_HANDLER', #CLIENT
+    'JWT_KRONERO_HANDLER', #KRONEROS 
+    'JWT_ADMINISTRATOR_HANDLER',#ADMINISTRATORS
     'JWT_PAYLOAD_GET_USER_ID_HANDLER',
     'JWT_PAYLOAD_GET_USERNAME_HANDLER',
     'JWT_RESPONSE_PAYLOAD_HANDLER',
