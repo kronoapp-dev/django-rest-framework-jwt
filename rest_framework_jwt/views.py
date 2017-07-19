@@ -296,7 +296,7 @@ class ObtainUserKroneroJSONWebToken(APIView,CustomTokenVerify):
         if isinstance(verified,Response):
             return verified
         
-        user = UserKronero.objects.get(email=data["email"],password=data["password"],storeId=data["storeId"])
+        user = UserKronero.objects.get(email=data["email"],password=data["password"])
         payload = jwt_payload_handler_kronero(user)
         token = jwt_encode_handler(payload)
         return self.token_response(token, user, request)
