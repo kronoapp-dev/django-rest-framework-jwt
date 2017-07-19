@@ -202,7 +202,8 @@ def jwt_payload_handler_kronero(user):
         'address_line_1' : user.address_line_1,
         'address_line_2' : user.address_line_2,
         'phone' : user.phone,
-        'storeId': user.storeId.id
+        'storeId': user.storeId.id,
+        'chainId': user.storeId.chainId.id
     }
     if user.birthday != None:
         payload['birthday'] = str(user.birthday)

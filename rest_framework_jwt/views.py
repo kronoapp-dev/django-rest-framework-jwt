@@ -131,17 +131,17 @@ class CustomTokenVerify():
         return payload
 
     def _check_userclient(self, payload):
-        if (not "username" in payload) or (not "password" in payload) or ( not "applicationId" in payload):
+        if (not "email" in payload) or (not "password" in payload) or ( not "applicationId" in payload):
             msg = _('Invalid payload fields for this user.')
             raise serializers.ValidationError(msg)
 
-        username = payload["username"]
+        email = payload["email"]
         password = payload["password"]
         applicationId = payload["applicationId"]
 
         # Make sure user exists
         try:
-            user = UserClient.objects.get(username=username,password=password,applicationId=applicationId)
+            user = UserClient.objects.get(email=email,password=password,applicationId=applicationId)
         except UserClient.DoesNotExist:
             msg = _("UserClient doesn't exist.")
             raise serializers.ValidationError(msg)
@@ -153,16 +153,16 @@ class CustomTokenVerify():
         return user
 
     def _check_userkronero(self, payload):
-        if (not "username" in payload) or (not "password" in payload) or (not "storeId" in payload):
+        if (not "email" in payload) or (not "password" in payload) or (not "storeId" in payload):
             msg = _('Invalid payload fields for this user.')
             raise serializers.ValidationError(msg)
-        username = payload["username"]
+        email = payload["email"]
         password = payload["password"]
         storeId = payload["storeId"]
 
         # Make sure user exists
         try:
-            user = UserKronero.objects.get(username=username,password=password,storeId=storeId)
+            user = UserKronero.objects.get(email=email,password=password,storeId=storeId)
         except UserKronero.DoesNotExist:
             msg = _("UserKronero doesn't exist.")
             raise serializers.ValidationError(msg)
@@ -174,16 +174,16 @@ class CustomTokenVerify():
         return user
 
     def _check_administrator(self, payload):
-        if (not "username" in payload) or (not "password" in payload) or (not "role" in payload):
+        if (not "email" in payload) or (not "password" in payload) or (not "role" in payload):
             msg = _('Invalid payload fields for this administrator.')
             raise serializers.ValidationError(msg)
-        username = payload["username"]
+        email = payload["email"]
         password = payload["password"]
         role = payload["role"]
 
         # Make sure user exists
         try:
-            user = Administrator.objects.get(username=username,password=password,role=role)
+            user = Administrator.objects.get(email=email,password=password,role=role)
         except Administrator.DoesNotExist:
             msg = _("Administrator doesn't exist.")
             raise serializers.ValidationError(msg)
@@ -229,7 +229,7 @@ class CustomTokenVerify():
 
 class ObtainUserCLientJSONWebToken(APIView,CustomTokenVerify):
     """
-    API View that receives a POST with a clients's username, password and applicationId.
+    API View that receives a POST with a clients's email, password and applicationId.
     """
     def post(self, request, *args, **kwargs):
         data = request.data
@@ -237,7 +237,7 @@ class ObtainUserCLientJSONWebToken(APIView,CustomTokenVerify):
         verified = serializer.validate_post_login(data)
         if isinstance(verified,Response):
             return verified
-        user = UserClient.objects.get(username=data["username"],password=data["password"],applicationId=data["applicationId"])
+        user = UserClient.objects.get(email=data["email"],password=data["password"],applicationId=data["applicationId"])
         payload = jwt_payload_handler_client(user)
         token = jwt_encode_handler(payload)
         return self.token_response(token, user, request)
@@ -245,7 +245,7 @@ class ObtainUserCLientJSONWebToken(APIView,CustomTokenVerify):
 
 class VerifyUserCLientJSONWebToken(APIView,CustomTokenVerify):
     """
-    API View that receives a POST with a clients's username, password and applicationId.
+    API View that receives a POST with a clients's email, password and applicationId.
     """
     def post(self, request, *args, **kwargs):
         data = request.data
@@ -259,7 +259,7 @@ class VerifyUserCLientJSONWebToken(APIView,CustomTokenVerify):
 
 class RefreshUserCLientJSONWebToken(APIView,CustomTokenVerify):
     """
-    API View that receives a POST with a clients's username, password and applicationId.
+    API View that receives a POST with a clients's email, password and applicationId.
     """
     def post(self, request, *args, **kwargs):
         data = request.data
@@ -287,7 +287,7 @@ verify_jwt_token_client = VerifyUserCLientJSONWebToken.as_view()
 #KRONERO
 class ObtainUserKroneroJSONWebToken(APIView,CustomTokenVerify):
     """
-    API View that receives a POST with a kroneros's username, password and storeId.
+    API View that receives a POST with a kroneros's email, password and storeId.
     """
     def post(self, request, *args, **kwargs):
         data = request.data
@@ -296,14 +296,14 @@ class ObtainUserKroneroJSONWebToken(APIView,CustomTokenVerify):
         if isinstance(verified,Response):
             return verified
         
-        user = UserKronero.objects.get(username=data["username"],password=data["password"],storeId=data["storeId"])
+        user = UserKronero.objects.get(email=data["email"],password=data["password"],storeId=data["storeId"])
         payload = jwt_payload_handler_kronero(user)
         token = jwt_encode_handler(payload)
         return self.token_response(token, user, request)
 
 class VerifyUserKroneroJSONWebToken(APIView,CustomTokenVerify):
     """
-    API View that receives a POST with a kroneros's username, password and storeId.
+    API View that receives a POST with a kroneros's email, password and storeId.
     """
     def post(self, request, *args, **kwargs):
         data = request.data
@@ -317,7 +317,7 @@ class VerifyUserKroneroJSONWebToken(APIView,CustomTokenVerify):
 
 class RefreshUserKroneroJSONWebToken(APIView,CustomTokenVerify):
     """
-    API View that receives a POST with a kroneros's username, password and storeId.
+    API View that receives a POST with a kroneros's email, password and storeId.
     """
     def post(self, request, *args, **kwargs):
         data = request.data
@@ -347,7 +347,7 @@ verify_jwt_token_kronero = VerifyUserKroneroJSONWebToken.as_view()
 
 class ObtainAdministratorJSONWebToken(APIView,CustomTokenVerify):
     """
-    API View that receives a POST with a administrators' username, password and role.
+    API View that receives a POST with a administrators' email, password and role.
     """
     def post(self, request, *args, **kwargs):
         data = request.data
@@ -356,7 +356,7 @@ class ObtainAdministratorJSONWebToken(APIView,CustomTokenVerify):
         if isinstance(verified,Response):
             return verified
         
-        user = Administrator.objects.get(username=data["username"],password=data["password"])
+        user = Administrator.objects.get(email=data["email"],password=data["password"])
         payload = jwt_payload_handler_administrator(user)
         token = jwt_encode_handler(payload)
         
@@ -364,7 +364,7 @@ class ObtainAdministratorJSONWebToken(APIView,CustomTokenVerify):
 
 class VerifyAdministratorJSONWebToken(APIView,CustomTokenVerify):
     """
-    API View that receives a POST with a administrators' username, password and role.
+    API View that receives a POST with a administrators' email, password and role.
     """
     def post(self, request, *args, **kwargs):
         data = request.data
@@ -379,7 +379,7 @@ class VerifyAdministratorJSONWebToken(APIView,CustomTokenVerify):
 
 class RefreshAdministratorJSONWebToken(APIView,CustomTokenVerify):
     """
-    API View that receives a POST with a administrators' username, password and role.
+    API View that receives a POST with a administrators' email, password and role.
     """
     def post(self, request, *args, **kwargs):
         data = request.data
