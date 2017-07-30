@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import jwt
 from django.utils.translation import ugettext as _
 
@@ -10,6 +12,9 @@ from rest_framework.response import Response
 from datetime import datetime
 from backend.models import *
 from backend.serializers import *
+
+import requests
+import json
 #from rest_framework_jwt.utils import jwt_payload_handler2
 
 from .settings import api_settings
@@ -25,6 +30,8 @@ jwt_payload_handler_administrator = api_settings.JWT_ADMINISTRATOR_HANDLER
 jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
 jwt_decode_handler = api_settings.JWT_DECODE_HANDLER
 
+url_google = 'https://www.googleapis.com/oauth2/v2/tokeninfo?id_token='
+url_facebook = 'https://graph.facebook.com/me?fields=id,email&access_token='
 
 class JSONWebTokenAPIView(APIView):
     """
@@ -131,17 +138,16 @@ class CustomTokenVerify():
         return payload
 
     def _check_userclient(self, payload):
-        if (not "email" in payload) or (not "password" in payload) or ( not "applicationId" in payload):
+        if (not "email" in payload) or ( not "applicationId" in payload):
             msg = _('Invalid payload fields for this user.')
             raise serializers.ValidationError(msg)
 
         email = payload["email"]
-        password = payload["password"]
         applicationId = payload["applicationId"]
 
         # Make sure user exists
         try:
-            user = UserClient.objects.get(email=email,password=password,applicationId=applicationId)
+            user = UserClient.objects.get(email=email,applicationId=applicationId)
         except UserClient.DoesNotExist:
             msg = _("UserClient doesn't exist.")
             raise serializers.ValidationError(msg)
@@ -153,16 +159,15 @@ class CustomTokenVerify():
         return user
 
     def _check_userkronero(self, payload):
-        if (not "email" in payload) or (not "password" in payload) or (not "storeId" in payload):
+        if (not "email" in payload) or  (not "storeId" in payload):
             msg = _('Invalid payload fields for this user.')
             raise serializers.ValidationError(msg)
         email = payload["email"]
-        password = payload["password"]
         storeId = payload["storeId"]
 
         # Make sure user exists
         try:
-            user = UserKronero.objects.get(email=email,password=password,storeId=storeId)
+            user = UserKronero.objects.get(email=email,storeId=storeId)
         except UserKronero.DoesNotExist:
             msg = _("UserKronero doesn't exist.")
             raise serializers.ValidationError(msg)
@@ -174,16 +179,15 @@ class CustomTokenVerify():
         return user
 
     def _check_administrator(self, payload):
-        if (not "email" in payload) or (not "password" in payload) or (not "role" in payload):
+        if (not "email" in payload) or (not "role" in payload):
             msg = _('Invalid payload fields for this administrator.')
             raise serializers.ValidationError(msg)
         email = payload["email"]
-        password = payload["password"]
         role = payload["role"]
 
         # Make sure user exists
         try:
-            user = Administrator.objects.get(email=email,password=password,role=role)
+            user = Administrator.objects.get(email=email,role=role)
         except Administrator.DoesNotExist:
             msg = _("Administrator doesn't exist.")
             raise serializers.ValidationError(msg)
@@ -225,6 +229,38 @@ class CustomTokenVerify():
             msg = _('orig_iat field is required.')
             raise serializers.ValidationError(msg)
 
+    def data_json_convert(self, data):
+        new_data = data.decode('utf8').replace("'", '"')
+        my_json = json.loads(new_data)
+        return my_json
+        return json.dumps(my_json, indent=4, sort_keys=True)
+
+    def plugin_login_verified(self, request, url, pluginkey):
+        data = request.data
+        if not pluginkey in data or not "applicationId" in data:
+            return Response({"detail":"%s or application Id not found" % pluginkey}, status=status.HTTP_400_BAD_REQUEST)
+        elif not isinstance(data["applicationId"],int):
+            return Response({"detail":"applicationId is not integer"}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            app = Application.objects.get(pk=data["applicationId"])
+        except:
+            return Response({"detail":"application not exists "}, status=status.HTTP_400_BAD_REQUEST)
+
+        response = requests.get(url + data[pluginkey])
+        json_data = self.data_json_convert(response.content)
+
+        if 'email' in json_data:
+            try:
+                user = UserClient.objects.get(email=json_data["email"],applicationId=app)
+            except:
+                return Response({"email":json_data["email"], "detail":"need registration"}, status=status.HTTP_200_OK)
+        else:
+            return Response({"detail":"expired or invalid access token"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        payload = jwt_payload_handler_client(user)
+        token = jwt_encode_handler(payload)
+        return self.token_response(token, user, request)
+
 #CLIENT 
 
 class ObtainUserCLientJSONWebToken(APIView,CustomTokenVerify):
@@ -241,7 +277,20 @@ class ObtainUserCLientJSONWebToken(APIView,CustomTokenVerify):
         payload = jwt_payload_handler_client(user)
         token = jwt_encode_handler(payload)
         return self.token_response(token, user, request)
-        
+  
+class ObtainUserCLientGoogleJSONWebToken(APIView,CustomTokenVerify):
+    """
+    API View that receives a POST with a clients's email, password and applicationId.
+    """
+    def post(self, request, *args, **kwargs):
+        return self.plugin_login_verified(request,url_google,"id_token")
+
+class ObtainUserCLientFacebookJSONWebToken(APIView,CustomTokenVerify):
+    """
+    API View that receives a POST with a clients's email, password and applicationId.
+    """
+    def post(self, request, *args, **kwargs):
+        return self.plugin_login_verified(request,url_facebook, "access_token")
 
 class VerifyUserCLientJSONWebToken(APIView,CustomTokenVerify):
     """
@@ -256,7 +305,6 @@ class VerifyUserCLientJSONWebToken(APIView,CustomTokenVerify):
         user = self._check_userclient(payload=payload)
         return self.token_response(token, user, request)
     
-
 class RefreshUserCLientJSONWebToken(APIView,CustomTokenVerify):
     """
     API View that receives a POST with a clients's email, password and applicationId.
@@ -279,7 +327,10 @@ class RefreshUserCLientJSONWebToken(APIView,CustomTokenVerify):
         token = jwt_encode_handler(new_payload)
         return self.token_response(token, user, request)
     
-obtain_jwt_token_client = ObtainUserCLientJSONWebToken.as_view()
+obtain_jwt_token_client          = ObtainUserCLientJSONWebToken.as_view()
+obtain_jwt_token_client_google   = ObtainUserCLientGoogleJSONWebToken.as_view()
+obtain_jwt_token_client_facebook = ObtainUserCLientFacebookJSONWebToken.as_view()
+
 refresh_jwt_token_client = RefreshUserCLientJSONWebToken.as_view()
 verify_jwt_token_client = VerifyUserCLientJSONWebToken.as_view()
 
@@ -400,6 +451,7 @@ class RefreshAdministratorJSONWebToken(APIView,CustomTokenVerify):
         token = jwt_encode_handler(new_payload)
         
         return self.token_response(token, user, request)
+
 
 #Administrator Autentication
 obtain_jwt_token_administrator = ObtainAdministratorJSONWebToken.as_view()

@@ -148,21 +148,11 @@ def jwt_payload_handler_client(user):
     )
     payload = {
         'user_id': user.pk,
-        'username': user.username,
         'exp': datetime.utcnow() + api_settings.JWT_EXPIRATION_DELTA,
         'email':user.email,
-        'password': user.password,
-        'name': user.name,
-        'document' : user.document,
-        'picture' : user.picture,
-        'gender' : user.gender,
-        'phone' : user.phone,
-        'applicationId': user.applicationId.id
+        'applicationId': user.applicationId.id,
+        'role': 'Client'
     }
-    if user.birthday != None:
-        payload['birthday'] = str(user.birthday)
-    else:
-        payload['birthday'] = user.birthday
 
     # Include original issued at time for a brand new token,
     # to allow token refresh
@@ -191,24 +181,12 @@ def jwt_payload_handler_kronero(user):
     )
     payload = {
         'user_id': user.pk,
-        'username': user.username,
         'exp': datetime.utcnow() + api_settings.JWT_EXPIRATION_DELTA,
         'email':user.email,
-        'password': user.password,
-        'name': user.name,
-        'document' : user.document,
-        'picture' : user.picture,
-        'gender' : user.gender,
-        'address_line_1' : user.address_line_1,
-        'address_line_2' : user.address_line_2,
-        'phone' : user.phone,
         'storeId': user.storeId.id,
-        'chainId': user.storeId.chainId.id
+        'chainId': user.storeId.chainId.id,
+        'role': 'Kronero'
     }
-    if user.birthday != None:
-        payload['birthday'] = str(user.birthday)
-    else:
-        payload['birthday'] = user.birthday
 
     # Include original issued at time for a brand new token,
     # to allow token refresh
@@ -237,26 +215,14 @@ def jwt_payload_handler_administrator(user):
     )
     payload = {
         'user_id': user.pk,
-        'username': user.username,
         'exp': datetime.utcnow() + api_settings.JWT_EXPIRATION_DELTA,
         'email':user.email,
-        'password': user.password,
-        'name': user.name,
-        'document' : user.document,
-        'picture' : user.picture,
-        'gender' : user.gender,
-        'address_line_1' : user.address_line_1,
-        'address_line_2' : user.address_line_2,
-        'phone' : user.phone,
         'role': user.role
     }
-    if user.birthday != None:
-        payload['birthday'] = str(user.birthday)
-    else:
-        payload['birthday'] = user.birthday
 
     if user.role == 'Store':
         payload['storeId'] = user.storeId.id
+        payload['chainId'] = user.storeId.chainId.id
     elif user.role == 'Chain':
         payload['chainId'] = user.chainId.id
     elif user.role == 'Application':
