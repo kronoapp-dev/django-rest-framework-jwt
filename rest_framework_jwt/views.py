@@ -270,10 +270,10 @@ class ObtainUserCLientJSONWebToken(APIView,CustomTokenVerify):
     def post(self, request, *args, **kwargs):
         data = request.data
         serializer = UserClientLoginSerializer(data=data)
-        verified = serializer.validate_post_login(data)
-        if isinstance(verified,Response):
-            return verified
-        user = UserClient.objects.get(email=data["email"],password=data["password"],applicationId=data["applicationId"])
+        user = serializer.validate_post_login(data)
+        if isinstance(user,Response):
+            return user
+        #user = UserClient.objects.get(email=data["email"],password=data["password"],applicationId=data["applicationId"])
         payload = jwt_payload_handler_client(user)
         token = jwt_encode_handler(payload)
         return self.token_response(token, user, request)
@@ -343,11 +343,10 @@ class ObtainUserKroneroJSONWebToken(APIView,CustomTokenVerify):
     def post(self, request, *args, **kwargs):
         data = request.data
         serializer = UserKroneroLoginSerializer(data=data)
-        verified = serializer.validate_post_login(data)
-        if isinstance(verified,Response):
-            return verified
-        
-        user = UserKronero.objects.get(email=data["email"],password=data["password"])
+        user = serializer.validate_post_login(data)
+        if isinstance(user,Response):
+            return user
+        #user = UserKronero.objects.get(email=data["email"],password=data["password"])
         payload = jwt_payload_handler_kronero(user)
         token = jwt_encode_handler(payload)
         return self.token_response(token, user, request)
@@ -403,14 +402,13 @@ class ObtainAdministratorJSONWebToken(APIView,CustomTokenVerify):
     def post(self, request, *args, **kwargs):
         data = request.data
         serializer = AdministratorLoginSerializer(data=data)
-        verified = serializer.validate_post_login(data)
-        if isinstance(verified,Response):
-            return verified
+        user = serializer.validate_post_login(data)
+        if isinstance(user,Response):
+            return user
         
-        user = Administrator.objects.get(email=data["email"],password=data["password"])
+        #user = Administrator.objects.get(email=data["email"],password=data["password"])
         payload = jwt_payload_handler_administrator(user)
         token = jwt_encode_handler(payload)
-        
         return self.token_response(token, user, request)
 
 class VerifyAdministratorJSONWebToken(APIView,CustomTokenVerify):
