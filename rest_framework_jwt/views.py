@@ -255,7 +255,7 @@ class CustomTokenVerify():
             except:
                 return Response({"email":json_data["email"], "detail":"need registration"}, status=status.HTTP_200_OK)
         else:
-            return Response({"detail":"expired or invalid access token"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail":"expired or invalid %s" % pluginkey}, status=status.HTTP_400_BAD_REQUEST)
         
         payload = jwt_payload_handler_client(user)
         token = jwt_encode_handler(payload)
@@ -280,14 +280,14 @@ class ObtainUserCLientJSONWebToken(APIView,CustomTokenVerify):
   
 class ObtainUserCLientGoogleJSONWebToken(APIView,CustomTokenVerify):
     """
-    API View that receives a POST with a clients's email, password and applicationId.
+    API View that receives a POST with a clients google auth.
     """
     def post(self, request, *args, **kwargs):
         return self.plugin_login_verified(request,url_google,"id_token")
 
 class ObtainUserCLientFacebookJSONWebToken(APIView,CustomTokenVerify):
     """
-    API View that receives a POST with a clients's email, password and applicationId.
+    API View that receives a POST with a clients facebook auth.
     """
     def post(self, request, *args, **kwargs):
         return self.plugin_login_verified(request,url_facebook, "access_token")
