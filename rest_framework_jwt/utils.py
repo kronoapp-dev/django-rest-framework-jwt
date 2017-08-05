@@ -1,12 +1,24 @@
+# -*- coding: utf-8 -*-
+#
+#
+#   Name:
+#       utils.py
+#
+#   Description
+#
+#   Modify By:
+#       Andres Navarro
+#
+#   Version:
+#       0.1
+#
+
 import jwt
 import uuid
 import warnings
-
 from django.contrib.auth import get_user_model
-
 from calendar import timegm
 from datetime import datetime
-
 from rest_framework_jwt.compat import get_username
 from rest_framework_jwt.compat import get_username_field
 from rest_framework_jwt.settings import api_settings
