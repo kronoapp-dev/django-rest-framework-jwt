@@ -261,6 +261,8 @@ class ObtainUserCLientJSONWebToken(APIView,CustomTokenVerify):
         data = request.data
         serializer = UserClientLoginSerializer(data=data)
         user = serializer.validate_post_login(data, UserClient)
+        if isinstance(user,Response):
+            return user
         payload = jwt_payload_handler_client(user)
         token = jwt_encode_handler(payload)
         return self.token_response(token, user, request)
@@ -319,6 +321,8 @@ class ObtainUserKroneroJSONWebToken(APIView,CustomTokenVerify):
         data        = request.data
         serializer  = UserKroneroLoginSerializer(data=data)
         user        = serializer.validate_post_login(data, UserKronero)
+        if isinstance(user,Response):
+            return user
         payload     = jwt_payload_handler_kronero(user)
         token       = jwt_encode_handler(payload)
         return self.token_response(token, user, request)
@@ -362,6 +366,8 @@ class ObtainAdministratorJSONWebToken(APIView,CustomTokenVerify):
         data        = request.data
         serializer  = AdministratorLoginSerializer(data=data)
         user        = serializer.validate_post_login(data, Administrator)
+        if isinstance(user,Response):
+            return user
         payload     = jwt_payload_handler_administrator(user)
         token       = jwt_encode_handler(payload)
         return self.token_response(token, user, request)
