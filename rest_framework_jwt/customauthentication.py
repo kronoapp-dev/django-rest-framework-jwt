@@ -23,6 +23,7 @@ from rest_framework.authentication import (
 )
 
 from rest_framework_jwt.settings import api_settings
+from backend.models import *
 jwt_decode_handler = api_settings.JWT_DECODE_HANDLER
 jwt_get_username_from_payload = api_settings.JWT_PAYLOAD_GET_USERNAME_HANDLER
 
@@ -41,7 +42,7 @@ class BaseCustomJSONWebTokenAuthentication(BaseAuthentication):
         if jwt_value is None:
             return None
         try:
-            payload = jwt_decode_handler(jwt_value)
+            payload = jwt_decode_handler(jwt_value) 
         except jwt.ExpiredSignature:
             raise exceptions.ValidationError({"error":9})
         except jwt.DecodeError:
@@ -49,24 +50,30 @@ class BaseCustomJSONWebTokenAuthentication(BaseAuthentication):
         except jwt.InvalidTokenError:
             raise exceptions.AuthenticationFailed()
         user = self.authenticate_credentials(payload)
-        #boolean = True
-        #a = (user,boolean)
-        return (user, jwt_value)
+        array = [user,payload.get('role')]
+        return (array, jwt_value)
 
     def authenticate_credentials(self, payload):
         """
         Returns an active user that matches the payload's user id and email.
         """
-        User = get_user_model()
-        username = jwt_get_username_from_payload(payload)
-
-        if not username:
-            raise exceptions.ValidationError({"error":11})
-
+        #print(payload.get('role'))
         try:
-            user = User.objects.get_by_natural_key(username)
-        except User.DoesNotExist:
-            raise exceptions.ValidationError({"error":6})
+            role = payload.get('role')
+            user_id = payload.get('user_id')
+        except:
+            raise exceptions.ValidationError({"error":11})
+        try:
+            if role == 'Client':
+                user = UserClient.objects.get(pk=user_id)
+            elif role == 'Kronero':
+                user = UserKronero.objects.get(pk=user_id)
+            elif (role == 'Global') or (role == 'Store') or (role == 'Chain') or (role == 'Application'):
+                user = Administrator.objects.get(pk=user_id)
+            else:
+                raise exceptions.ValidationError({"error":21})
+        except:
+            raise exceptions.AuthenticationFailed({"error":20})
 
         if not user.is_active:
             raise exceptions.ValidationError({"error":8})

@@ -16,10 +16,11 @@
 """
 Provides a set of pluggable permission policies.
 """
-from __future__ import unicode_literals
+#from __future__ import unicode_literals
 
-from django.http import Http404
-from rest_framework.compat import is_authenticated
+#from django.http import Http404
+#from rest_framework.compat import is_authenticated
+from rest_framework import exceptions
 
 SAFE_METHODS = ('GET', 'HEAD', 'OPTIONS')
 
@@ -41,8 +42,18 @@ class BasePermission(object):
         """
         return True
 
+    def check_role(self,request,view, array):
+        print(request.user)
+        try:
+            if request.user[1] in array:
+                return True
+            else:
+                raise exceptions.PermissionDenied({"error":23})
+        except:
+            raise exceptions.PermissionDenied({"error":23})
 
-class AllowAny(BasePermission):
+
+class AllowAny(BasePermission): 
     """
     Allow any access.
     This isn't strictly required, since you could use an empty
@@ -53,82 +64,188 @@ class AllowAny(BasePermission):
     def has_permission(self, request, view):
         return True
 
-
-class IsAuthenticated(BasePermission):
+class Global(BasePermission): 
     """
-    Allows access only to authenticated users.
     """
-
     def has_permission(self, request, view):
-        #print(request.user)
-        return True
-        #return request.user and is_authenticated(request.user)
+        return self.check_role(request,view, ['Global'])
 
-
-class IsAdminUser(BasePermission):
+class Client(BasePermission): 
     """
-    Allows access only to admin users.
     """
-
     def has_permission(self, request, view):
-        #print(request.user)
-        return True
-        #return request.user and request.user.is_staff
+        return self.check_role(request,view, ['Global','Client'])
 
-
-class IsAuthenticatedOrReadOnly(BasePermission):
+class Kronero(BasePermission): 
     """
-    The request is authenticated as a user, or is a read-only request.
     """
-
     def has_permission(self, request, view):
-        print(request.user)
-        return True
-        #return (
-        #    request.method in SAFE_METHODS or
-        #    request.user and
-        #    is_authenticated(request.user)
-        #)
+        return self.check_role(request,view, ['Global','Kronero'])
 
-class IsAuthenticated_0(BasePermission):
+class Application(BasePermission): 
     """
     """
-
     def has_permission(self, request, view):
-        return True
+        return self.check_role(request,view, ['Global','Application'])
 
-
-class IsAuthenticated_1(BasePermission):
+class Store(BasePermission): 
     """
     """
-
     def has_permission(self, request, view):
-        #print(request.user)
-        return True
-        #return request.user and is_authenticated(request.user)
+        return self.check_role(request,view, ['Global','Store'])
 
-
-class IsAuthenticated_2(BasePermission):
+class Chain(BasePermission):
     """
-    Allows access only to admin users.
     """
-
     def has_permission(self, request, view):
-        #print(request.user)
-        return True
-        #return request.user and request.user.is_staff
+        return self.check_role(request,view, ['Global','Chain']) 
 
-
-class IsAuthenticated_3(BasePermission):
+class ClientKronero(BasePermission):
     """
-    The request is authenticated as a user, or is a read-only request.
     """
-
     def has_permission(self, request, view):
-        #print(request.user)
-        return True
-        #return (
-        #    request.method in SAFE_METHODS or
-        #    request.user and
-        #    is_authenticated(request.user)
-        #)
+        return self.check_role(request,view, ['Global','Client','Kronero']) 
+
+class ClientApplication(BasePermission):
+    """
+    """
+    def has_permission(self, request, view):
+        return self.check_role(request,view, ['Global','Client','Application']) 
+
+class ClientStore(BasePermission):
+    """
+    """
+    def has_permission(self, request, view):
+        return self.check_role(request,view, ['Global','Client','Store']) 
+
+class ClientChain(BasePermission):
+    """
+    """
+    def has_permission(self, request, view):
+        return self.check_role(request,view, ['Global','Client','Chain']) 
+
+class KroneroApplication(BasePermission):
+    """
+    """
+    def has_permission(self, request, view):
+        return self.check_role(request,view, ['Global','Kronero','Application']) 
+
+class KroneroStore(BasePermission):
+    """
+    """
+    def has_permission(self, request, view):
+        return self.check_role(request,view, ['Global','Kronero','Store']) 
+
+class KroneroChain(BasePermission):
+    """
+    """
+    def has_permission(self, request, view):
+        return self.check_role(request,view, ['Global','Kronero','Chain']) 
+
+class ApplicationStore(BasePermission):
+    """
+    """
+    def has_permission(self, request, view):
+        return self.check_role(request,view, ['Global','Application', 'Store']) 
+
+class ApplicationChain(BasePermission):
+    """
+    """
+    def has_permission(self, request, view):
+        return self.check_role(request,view, ['Global','Application','Chain']) 
+
+class StoreChain(BasePermission):
+    """
+    """
+    def has_permission(self, request, view):
+        return self.check_role(request,view, ['Global','Store','Chain']) 
+
+class ClientKroneroApplication(BasePermission):
+    """
+    """
+    def has_permission(self, request, view):
+        return self.check_role(request,view, ['Global','Client','Kronero','Application']) 
+
+class ClientKroneroStore(BasePermission):
+    """
+    """
+    def has_permission(self, request, view):
+        return self.check_role(request,view, ['Global','Client','Kronero','Store']) 
+
+class ClientKroneroChain(BasePermission):
+    """
+    """
+    def has_permission(self, request, view):
+        return self.check_role(request,view, ['Global','Client','Kronero','Chain']) 
+
+class ClientApplicationStore(BasePermission):
+    """
+    """
+    def has_permission(self, request, view):
+        return self.check_role(request,view, ['Global','Client','Application','Store']) 
+
+class ClientApplicationChain(BasePermission):
+    """
+    """
+    def has_permission(self, request, view):
+        return self.check_role(request,view, ['Global','Client','Application','Chain']) 
+
+class ClientStoreChain(BasePermission):
+    """
+    """
+    def has_permission(self, request, view):
+        return self.check_role(request,view, ['Global','Client','Store','Chain']) 
+
+class KroneroApplicationStore(BasePermission):
+    """
+    """
+    def has_permission(self, request, view):
+        return self.check_role(request,view, ['Global','Kronero','Application','Store']) 
+
+class KroneroApplicationChain(BasePermission):
+    """
+    """
+    def has_permission(self, request, view):
+        return self.check_role(request,view, ['Global','Kronero','Application','Chain']) 
+
+class KroneroStoreChain(BasePermission):
+    """
+    """
+    def has_permission(self, request, view):
+        return self.check_role(request,view, ['Global','Kronero','Store','Chain']) 
+
+class ApplicationStoreChain(BasePermission):
+    """
+    """
+    def has_permission(self, request, view):
+        return self.check_role(request,view, ['Global','Application','Store','Chain']) 
+
+class ClientKroneroApplicationStore(BasePermission):
+    """
+    """
+    def has_permission(self, request, view):
+        return self.check_role(request,view, ['Global','Client','Kronero','Application','Store'])
+
+class ClientKroneroApplicationChain(BasePermission):
+    """
+    """
+    def has_permission(self, request, view):
+        return self.check_role(request,view, ['Global','Client','Kronero','Application','Chain'])
+
+class ClientKroneroStoreChain(BasePermission):
+    """
+    """
+    def has_permission(self, request, view):
+        return self.check_role(request,view, ['Global','Client','Kronero','Store','Chain']) 
+
+class ClientApplicationStoreChain(BasePermission):
+    """
+    """
+    def has_permission(self, request, view):
+        return self.check_role(request,view, ['Global','Client','Application','Store','Chain']) 
+
+class KroneroApplicationChainStore(BasePermission):
+    """
+    """
+    def has_permission(self, request, view):
+        return self.check_role(request,view, ['Global','Kronero','Application','Store','Chain']) 
