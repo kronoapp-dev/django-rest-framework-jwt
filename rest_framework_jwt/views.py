@@ -30,6 +30,7 @@ from .serializers import (
     JSONWebTokenSerializer, RefreshJSONWebTokenSerializer,
     VerifyJSONWebTokenSerializer
 )
+from .permissions import *
 
 jwt_response_payload_handler = api_settings.JWT_RESPONSE_PAYLOAD_HANDLER
 jwt_payload_handler_client = api_settings.JWT_CLIENT_HANDLER
@@ -254,6 +255,7 @@ class CustomTokenVerify():
 #CLIENT 
 
 class ObtainUserCLientJSONWebToken(APIView,CustomTokenVerify):
+    #permission_classes = (AllowAny,)
     """
     API View that receives a POST with a clients's email, password and applicationId.
     """
@@ -268,6 +270,7 @@ class ObtainUserCLientJSONWebToken(APIView,CustomTokenVerify):
         return self.token_response(token, user, request)
   
 class ObtainUserCLientGoogleJSONWebToken(APIView,CustomTokenVerify):
+    #permission_classes = (AllowAny,)
     """
     API View that receives a POST with a clients google auth.
     """
@@ -275,6 +278,7 @@ class ObtainUserCLientGoogleJSONWebToken(APIView,CustomTokenVerify):
         return self.plugin_login_verified(request,url_google,"id_token")
 
 class ObtainUserCLientFacebookJSONWebToken(APIView,CustomTokenVerify):
+    #permission_classes = (AllowAny,)
     """
     API View that receives a POST with a clients facebook auth.
     """
@@ -282,6 +286,7 @@ class ObtainUserCLientFacebookJSONWebToken(APIView,CustomTokenVerify):
         return self.plugin_login_verified(request,url_facebook, "access_token")
 
 class VerifyUserCLientJSONWebToken(APIView,CustomTokenVerify):
+    #permission_classes = (OnlyClient,)
     """
     API View that receives a POST with a clients's email, password and applicationId.
     """
@@ -292,6 +297,7 @@ class VerifyUserCLientJSONWebToken(APIView,CustomTokenVerify):
         return self.token_response(token, user, request)
     
 class RefreshUserCLientJSONWebToken(APIView,CustomTokenVerify):
+    #permission_classes = (OnlyClient,)
     """
     API View that receives a POST with a clients's email, password and applicationId.
     """
@@ -314,6 +320,7 @@ verify_jwt_token_client             = VerifyUserCLientJSONWebToken.as_view()
 
 #KRONERO
 class ObtainUserKroneroJSONWebToken(APIView,CustomTokenVerify):
+    #permission_classes = (AllowAny,)
     """
     API View that receives a POST with a kroneros's email, password and storeId.
     """
@@ -328,6 +335,7 @@ class ObtainUserKroneroJSONWebToken(APIView,CustomTokenVerify):
         return self.token_response(token, user, request)
 
 class VerifyUserKroneroJSONWebToken(APIView,CustomTokenVerify):
+    #permission_classes = (OnlyKronero,)
     """
     API View that receives a POST with a kroneros's email, password and storeId.
     """
@@ -338,6 +346,7 @@ class VerifyUserKroneroJSONWebToken(APIView,CustomTokenVerify):
         return self.token_response(token, user, request)
 
 class RefreshUserKroneroJSONWebToken(APIView,CustomTokenVerify):
+    #permission_classes = (OnlyKronero,)
     """
     API View that receives a POST with a kroneros's email, password and storeId.
     """
@@ -359,6 +368,7 @@ verify_jwt_token_kronero    = VerifyUserKroneroJSONWebToken.as_view()
 #ADMINISTRATORS
 
 class ObtainAdministratorJSONWebToken(APIView,CustomTokenVerify):
+    #permission_classes = (AllowAny,)
     """
     API View that receives a POST with a administrators' email, password and role.
     """
@@ -373,6 +383,7 @@ class ObtainAdministratorJSONWebToken(APIView,CustomTokenVerify):
         return self.token_response(token, user, request)
 
 class VerifyAdministratorJSONWebToken(APIView,CustomTokenVerify):
+    #permission_classes = (ApplicationStoreChain,)
     """
     API View that receives a POST with a administrators' email, password and role.
     """
@@ -383,6 +394,7 @@ class VerifyAdministratorJSONWebToken(APIView,CustomTokenVerify):
         return self.token_response(token, user, request)
 
 class RefreshAdministratorJSONWebToken(APIView,CustomTokenVerify):
+    #permission_classes = (ApplicationStoreChain,)
     """
     API View that receives a POST with a administrators' email, password and role.
     """

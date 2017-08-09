@@ -249,3 +249,21 @@ class KroneroApplicationChainStore(BasePermission):
     """
     def has_permission(self, request, view):
         return self.check_role(request,view, ['Global','Kronero','Application','Store','Chain']) 
+
+class ClientKroneroApplicationChainStore(BasePermission):
+    """
+    """
+    def has_permission(self, request, view):
+        return self.check_role(request,view, ['Global','Client','Kronero','Application','Store','Chain']) 
+
+class OnlyClient(BasePermission): 
+    """
+    """
+    def has_permission(self, request, view):
+        return self.check_role(request,view, ['Client'])
+
+class OnlyKronero(BasePermission): 
+    """
+    """
+    def has_permission(self, request, view):
+        return self.check_role(request,view, ['Kronero'])
