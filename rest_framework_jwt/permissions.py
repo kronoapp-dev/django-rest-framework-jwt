@@ -82,7 +82,7 @@ class Kronero(BasePermission):
     def has_permission(self, request, view):
         return self.check_role(request,view, ['Global','Kronero'])
 
-class Application(BasePermission): 
+class ApplicationGlobal(BasePermission): 
     """
     """
     def has_permission(self, request, view):

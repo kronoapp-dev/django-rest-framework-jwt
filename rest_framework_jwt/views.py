@@ -22,7 +22,7 @@ from datetime import datetime, timedelta
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
-from backend.models import *
+from backend.models import UserClient, UserKronero, Administrator, Application
 from backend.serializers import *
 from rest_framework import exceptions
 from .settings import api_settings
@@ -232,8 +232,11 @@ class CustomTokenVerify():
             app = Application.objects.get(pk=data["applicationId"])
         except:
             raise exceptions.NotFound({"error":16})
-        response = requests.get(url + data[pluginkey])
-        json_data = self.data_json_convert(response.content)
+        try:    
+            response = requests.get(url + data[pluginkey])
+            json_data = self.data_json_convert(response.content)
+        except:
+            raise exceptions.NotFound({"error":"not internet conection with google or facebook"})
 
         if 'email' in json_data:
             try:
@@ -275,6 +278,7 @@ class ObtainUserCLientGoogleJSONWebToken(APIView,CustomTokenVerify):
     API View that receives a POST with a clients google auth.
     """
     def post(self, request, *args, **kwargs):
+        print(request.data)
         return self.plugin_login_verified(request,url_google,"id_token")
 
 class ObtainUserCLientFacebookJSONWebToken(APIView,CustomTokenVerify):
@@ -283,6 +287,7 @@ class ObtainUserCLientFacebookJSONWebToken(APIView,CustomTokenVerify):
     API View that receives a POST with a clients facebook auth.
     """
     def post(self, request, *args, **kwargs):
+        print(request.data)
         return self.plugin_login_verified(request,url_facebook, "access_token")
 
 class VerifyUserCLientJSONWebToken(APIView,CustomTokenVerify):
