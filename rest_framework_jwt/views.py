@@ -31,6 +31,7 @@ from .serializers import (
     VerifyJSONWebTokenSerializer
 )
 from .permissions import *
+from rest_api.global_setting import *
 
 jwt_response_payload_handler = api_settings.JWT_RESPONSE_PAYLOAD_HANDLER
 jwt_payload_handler_client = api_settings.JWT_CLIENT_HANDLER
@@ -38,9 +39,6 @@ jwt_payload_handler_kronero = api_settings.JWT_KRONERO_HANDLER
 jwt_payload_handler_administrator = api_settings.JWT_ADMINISTRATOR_HANDLER
 jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
 jwt_decode_handler = api_settings.JWT_DECODE_HANDLER
-
-url_google = 'https://www.googleapis.com/oauth2/v2/tokeninfo?id_token='
-url_facebook = 'https://graph.facebook.com/me?fields=id,email&access_token='
 
 class JSONWebTokenAPIView(APIView):
     """
@@ -279,7 +277,7 @@ class ObtainUserCLientGoogleJSONWebToken(APIView,CustomTokenVerify):
     """
     def post(self, request, *args, **kwargs):
         print(request.data)
-        return self.plugin_login_verified(request,url_google,"id_token")
+        return self.plugin_login_verified(request,URL_GOOGLE,"id_token")
 
 class ObtainUserCLientFacebookJSONWebToken(APIView,CustomTokenVerify):
     #permission_classes = (AllowAny,)
@@ -288,7 +286,7 @@ class ObtainUserCLientFacebookJSONWebToken(APIView,CustomTokenVerify):
     """
     def post(self, request, *args, **kwargs):
         print(request.data)
-        return self.plugin_login_verified(request,url_facebook, "access_token")
+        return self.plugin_login_verified(request,URL_FACEBOOK, "access_token")
 
 class VerifyUserCLientJSONWebToken(APIView,CustomTokenVerify):
     #permission_classes = (OnlyClient,)
