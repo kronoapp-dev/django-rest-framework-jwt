@@ -98,13 +98,13 @@ class ApplicationGlobal(BasePermission):
     def has_permission(self, request, view):
         return self.check_role(request,view, ['Global','Application'])
 
-class Store(BasePermission): 
+class StoreGlobal(BasePermission): 
     """
     """
     def has_permission(self, request, view):
         return self.check_role(request,view, ['Global','Store'])
 
-class Chain(BasePermission):
+class ChainGlobal(BasePermission):
     """
     """
     def has_permission(self, request, view):
