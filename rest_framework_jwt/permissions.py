@@ -43,7 +43,6 @@ class BasePermission(object):
         return True
 
     def check_role(self,request,view, array):
-        print(request.user)
         try:
             if request.user[1] in array:
                 return True
@@ -63,6 +62,17 @@ class AllowAny(BasePermission):
 
     def has_permission(self, request, view):
         return True
+
+class NotAllowAny(BasePermission): 
+    """
+    Allow any access.
+    This isn't strictly required, since you could use an empty
+    permission_classes list, but it's useful because it makes the intention
+    more explicit.
+    """
+
+    def has_permission(self, request, view):
+        return False
 
 class Global(BasePermission): 
     """

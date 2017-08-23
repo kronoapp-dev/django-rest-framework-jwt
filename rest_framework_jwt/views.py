@@ -289,7 +289,7 @@ class ObtainUserCLientFacebookJSONWebToken(APIView,CustomTokenVerify):
         return self.plugin_login_verified(request,URL_FACEBOOK, "access_token")
 
 class VerifyUserCLientJSONWebToken(APIView,CustomTokenVerify):
-    #permission_classes = (OnlyClient,)
+    permission_classes = (OnlyClient,)
     """
     API View that receives a POST with a clients's email, password and applicationId.
     """
@@ -300,7 +300,7 @@ class VerifyUserCLientJSONWebToken(APIView,CustomTokenVerify):
         return self.token_response(token, user, request)
     
 class RefreshUserCLientJSONWebToken(APIView,CustomTokenVerify):
-    #permission_classes = (OnlyClient,)
+    permission_classes = (OnlyClient,)
     """
     API View that receives a POST with a clients's email, password and applicationId.
     """
@@ -338,7 +338,7 @@ class ObtainUserKroneroJSONWebToken(APIView,CustomTokenVerify):
         return self.token_response(token, user, request)
 
 class VerifyUserKroneroJSONWebToken(APIView,CustomTokenVerify):
-    #permission_classes = (OnlyKronero,)
+    permission_classes = (OnlyKronero,)
     """
     API View that receives a POST with a kroneros's email, password and storeId.
     """
@@ -349,7 +349,7 @@ class VerifyUserKroneroJSONWebToken(APIView,CustomTokenVerify):
         return self.token_response(token, user, request)
 
 class RefreshUserKroneroJSONWebToken(APIView,CustomTokenVerify):
-    #permission_classes = (OnlyKronero,)
+    permission_classes = (OnlyKronero,)
     """
     API View that receives a POST with a kroneros's email, password and storeId.
     """
@@ -386,7 +386,7 @@ class ObtainAdministratorJSONWebToken(APIView,CustomTokenVerify):
         return self.token_response(token, user, request)
 
 class VerifyAdministratorJSONWebToken(APIView,CustomTokenVerify):
-    #permission_classes = (ApplicationStoreChain,)
+    permission_classes = (NotAllowAny,)
     """
     API View that receives a POST with a administrators' email, password and role.
     """
@@ -397,7 +397,7 @@ class VerifyAdministratorJSONWebToken(APIView,CustomTokenVerify):
         return self.token_response(token, user, request)
 
 class RefreshAdministratorJSONWebToken(APIView,CustomTokenVerify):
-    #permission_classes = (ApplicationStoreChain,)
+    permission_classes = (NotAllowAny,)
     """
     API View that receives a POST with a administrators' email, password and role.
     """
