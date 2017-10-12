@@ -132,6 +132,13 @@ verify_jwt_token = VerifyJSONWebToken.as_view()
 
 class CustomTokenVerify():
 
+    def _check_payload_refresh(self, token):
+        try:
+            payload = jwt_decode_handler(token)
+        except jwt.DecodeError:
+            raise exceptions.ValidationError({"error":10})
+        return payload
+
     def _check_payload(self, token):
         try:
             payload = jwt_decode_handler(token)
@@ -306,7 +313,7 @@ class RefreshUserCLientJSONWebToken(APIView,CustomTokenVerify):
     """
     def post(self, request, *args, **kwargs):
         token                   = self.get_token_from_request(request)
-        payload                 = self._check_payload(token=token)
+        payload                 = self._check_payload_refresh(token=token)
         user                    = self._check_userclient(payload=payload)
         orig_iat                = self.verify_orig_iat(payload)
         new_payload             = jwt_payload_handler_client(user)
@@ -355,7 +362,7 @@ class RefreshUserKroneroJSONWebToken(APIView,CustomTokenVerify):
     """
     def post(self, request, *args, **kwargs):
         token                   = self.get_token_from_request(request)
-        payload                 = self._check_payload(token=token)
+        payload                 = self._check_payload_refresh(token=token)
         user                    = self._check_userkronero(payload=payload)
         orig_iat                = self.verify_orig_iat(payload)
         new_payload             = jwt_payload_handler_kronero(user)
