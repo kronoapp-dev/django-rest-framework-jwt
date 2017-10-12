@@ -204,8 +204,10 @@ class CustomTokenVerify():
 
     def verify_orig_iat(self, payload):
         try:
+
             orig_iat = payload.get('orig_iat')
             # Verify expiration
+
             refresh_limit = api_settings.JWT_REFRESH_EXPIRATION_DELTA
 
             if isinstance(refresh_limit, timedelta):
@@ -213,10 +215,12 @@ class CustomTokenVerify():
                                  refresh_limit.seconds)
 
             expiration_timestamp = orig_iat + int(refresh_limit)
+
             now_timestamp = timegm(datetime.utcnow().utctimetuple())
 
             if now_timestamp > expiration_timestamp:
-                raise exceptions.ValidationError({"error":14})
+                return False
+    
         except Exception:
             raise exceptions.ValidationError({"error":15})
 
@@ -284,7 +288,6 @@ class ObtainUserCLientGoogleJSONWebToken(APIView,CustomTokenVerify):
     API View that receives a POST with a clients google auth.
     """
     def post(self, request, *args, **kwargs):
-        print(request.data)
         return self.plugin_login_verified(request,URL_GOOGLE,"id_token")
 
 class ObtainUserCLientFacebookJSONWebToken(APIView,CustomTokenVerify):
@@ -293,7 +296,6 @@ class ObtainUserCLientFacebookJSONWebToken(APIView,CustomTokenVerify):
     API View that receives a POST with a clients facebook auth.
     """
     def post(self, request, *args, **kwargs):
-        print(request.data)
         return self.plugin_login_verified(request,URL_FACEBOOK, "access_token")
 
 class VerifyUserCLientJSONWebToken(APIView,CustomTokenVerify):
@@ -317,6 +319,8 @@ class RefreshUserCLientJSONWebToken(APIView,CustomTokenVerify):
         payload                 = self._check_payload_refresh(token=token)
         user                    = self._check_userclient(payload=payload)
         orig_iat                = self.verify_orig_iat(payload)
+        if orig_iat == False:
+            raise exceptions.ValidationError({"error":14})
         new_payload             = jwt_payload_handler_client(user)
         new_payload['orig_iat'] = orig_iat
         token                   = jwt_encode_handler(new_payload)
@@ -366,6 +370,8 @@ class RefreshUserKroneroJSONWebToken(APIView,CustomTokenVerify):
         payload                 = self._check_payload_refresh(token=token)
         user                    = self._check_userkronero(payload=payload)
         orig_iat                = self.verify_orig_iat(payload)
+        if orig_iat == False:
+            raise exceptions.ValidationError({"error":14})
         new_payload             = jwt_payload_handler_kronero(user)
         new_payload['orig_iat'] = orig_iat
         token                   = jwt_encode_handler(new_payload)
@@ -414,6 +420,8 @@ class RefreshAdministratorJSONWebToken(APIView,CustomTokenVerify):
         payload                 = self._check_payload(token=token)
         user                    = self._check_administrator(payload=payload)
         orig_iat                = self.verify_orig_iat(payload)
+        if orig_iat == False:
+            raise exceptions.ValidationError({"error":14})
         new_payload             = jwt_payload_handler_administrator(user)
         new_payload['orig_iat'] = orig_iat
         token                   = jwt_encode_handler(new_payload)

@@ -47,12 +47,12 @@ DEFAULTS = {
     'JWT_VERIFY': True,
     'JWT_VERIFY_EXPIRATION': True,
     'JWT_LEEWAY': 0,
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(minutes=2),
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(minutes=10),
     'JWT_AUDIENCE': None,
     'JWT_ISSUER': None,
 
     'JWT_ALLOW_REFRESH': True, #SET TRUE
-    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(minutes=5),
+    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(minutes=20),
 
     'JWT_AUTH_HEADER_PREFIX': 'JWT',
     'JWT_AUTH_COOKIE': None,
@@ -62,6 +62,7 @@ DEFAULTS = {
 IMPORT_STRINGS = (
     'JWT_ENCODE_HANDLER', 
     'JWT_DECODE_HANDLER',
+    'JWT_DECODE_HANDLER_REFRESH',
     'JWT_PAYLOAD_HANDLER',
     'JWT_CLIENT_HANDLER', #CLIENT
     'JWT_KRONERO_HANDLER', #KRONEROS 

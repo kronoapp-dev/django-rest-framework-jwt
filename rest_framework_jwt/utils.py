@@ -133,11 +133,12 @@ def jwt_decode_handler(token):
     )
 
 def jwt_decode_handler_refresh(token):
-    options = {}
+    options = {
+        'verify_exp': False,
+    }
     return jwt.decode(
         token,
         PUBLIC_KEY_PEM,
-        False,
         options=options,
         leeway=api_settings.JWT_LEEWAY,
         audience=api_settings.JWT_AUDIENCE,
