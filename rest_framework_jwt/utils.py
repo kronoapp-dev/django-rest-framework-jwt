@@ -132,6 +132,19 @@ def jwt_decode_handler(token):
         algorithms=[api_settings.JWT_ALGORITHM]
     )
 
+def jwt_decode_handler_refresh(token):
+    options = {}
+    return jwt.decode(
+        token,
+        PUBLIC_KEY_PEM,
+        False,
+        options=options,
+        leeway=api_settings.JWT_LEEWAY,
+        audience=api_settings.JWT_AUDIENCE,
+        issuer=api_settings.JWT_ISSUER,
+        algorithms=[api_settings.JWT_ALGORITHM]
+    )
+
 def jwt_response_payload_handler(token, user=None, request=None):
     """
     Returns the response data for both the login and refresh views.

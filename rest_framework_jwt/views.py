@@ -39,6 +39,7 @@ jwt_payload_handler_kronero = api_settings.JWT_KRONERO_HANDLER
 jwt_payload_handler_administrator = api_settings.JWT_ADMINISTRATOR_HANDLER
 jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
 jwt_decode_handler = api_settings.JWT_DECODE_HANDLER
+jwt_decode_handler_refresh = api_settings.JWT_DECODE_HANDLER_REFRESH
 
 class JSONWebTokenAPIView(APIView):
     """
@@ -134,7 +135,7 @@ class CustomTokenVerify():
 
     def _check_payload_refresh(self, token):
         try:
-            payload = jwt_decode_handler(token)
+            payload = jwt_decode_handler_refresh(token)
         except jwt.DecodeError:
             raise exceptions.ValidationError({"error":10})
         return payload

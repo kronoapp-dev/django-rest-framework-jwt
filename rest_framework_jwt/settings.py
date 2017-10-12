@@ -13,6 +13,9 @@ DEFAULTS = {
     'JWT_DECODE_HANDLER':
     'rest_framework_jwt.utils.jwt_decode_handler',
 
+    'JWT_DECODE_HANDLER_REFRESH':
+    'rest_framework_jwt.utils.jwt_decode_handler_refresh',
+
     'JWT_PAYLOAD_HANDLER':
     'rest_framework_jwt.utils.jwt_payload_handler',
 
@@ -44,12 +47,12 @@ DEFAULTS = {
     'JWT_VERIFY': True,
     'JWT_VERIFY_EXPIRATION': True,
     'JWT_LEEWAY': 0,
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=2),
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(minutes=2),
     'JWT_AUDIENCE': None,
     'JWT_ISSUER': None,
 
     'JWT_ALLOW_REFRESH': True, #SET TRUE
-    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=360),
+    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(minutes=5),
 
     'JWT_AUTH_HEADER_PREFIX': 'JWT',
     'JWT_AUTH_COOKIE': None,
