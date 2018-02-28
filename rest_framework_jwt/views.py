@@ -334,6 +334,50 @@ verify_jwt_token_client             = VerifyUserCLientJSONWebToken.as_view()
 
 
 #KRONERO
+
+class StateUserKronero():
+    #for email
+    def connect(self, email):
+        #Get the user 
+        query                   = UserKronero.objects.filter(email=email)   
+        #Save the result in aux     
+        actual                  = query[0]
+        nuevo                   = query[0]
+        #Change connected
+        nuevo.connected         = True    
+        dictionary              = nuevo.__dict__
+        #We are interested in 'storeId' not in "storeId_id"
+        if 'storeId_id' in dictionary:
+            dictionary['storeId'] = dictionary.pop('storeId_id')
+        serializer  = UserKroneroSerializer(actual, dictionary)  
+        if serializer.is_valid():            
+            serializer.save()  
+            return True
+        else:
+            print(serializer.errors)
+            return False
+    #for email
+    def disconnect(self, email):
+        #Get the user 
+        query                     = UserKronero.objects.filter(email=email)   
+        #Save the result in aux     
+        actual                    = query[0]
+        nuevo                     = query[0]
+        #Change connected
+        nuevo.connected           = False    
+        dictionary                = nuevo.__dict__
+        #We are interested in 'storeId' not in "storeId_id"
+        if 'storeId_id' in dictionary:
+            dictionary['storeId'] = dictionary.pop('storeId_id')
+        serializer  = UserKroneroSerializer(actual, dictionary)  
+        if serializer.is_valid():            
+            serializer.save()  
+            return True
+        else:
+            print(serializer.errors)
+            return False
+
+
 class ObtainUserKroneroJSONWebToken(APIView,CustomTokenVerify):
     #permission_classes = (AllowAny,)
     """
@@ -342,7 +386,9 @@ class ObtainUserKroneroJSONWebToken(APIView,CustomTokenVerify):
     def post(self, request, *args, **kwargs):
         data        = request.data
         serializer  = UserKroneroLoginSerializer(data=data)
-        user        = serializer.validate_post_login(data, UserKronero)
+        user        = serializer.validate_post_login(data, UserKronero) 
+        if hasattr(user, 'email'):
+            StateUserKronero().connect(user.email)       
         if isinstance(user,Response):
             return user
         payload     = jwt_payload_handler_kronero(user)
@@ -358,6 +404,8 @@ class VerifyUserKroneroJSONWebToken(APIView,CustomTokenVerify):
         token   = self.get_token_from_request(request)
         payload = self._check_payload(token=token)
         user    = self._check_userkronero(payload=payload)
+        if hasattr(user, 'email'):
+            StateUserKronero().connect(user.email) 
         return self.token_response(token, user, request)
 
 class RefreshUserKroneroJSONWebToken(APIView,CustomTokenVerify):
@@ -370,6 +418,8 @@ class RefreshUserKroneroJSONWebToken(APIView,CustomTokenVerify):
         payload                 = self._check_payload_refresh(token=token)
         user                    = self._check_userkronero(payload=payload)
         orig_iat                = self.verify_orig_iat(payload)
+        if hasattr(user, 'email'):
+            StateUserKronero().connect(user.email) 
         if orig_iat == False:
             raise exceptions.ValidationError({"error":14})
         new_payload             = jwt_payload_handler_kronero(user)
@@ -377,10 +427,20 @@ class RefreshUserKroneroJSONWebToken(APIView,CustomTokenVerify):
         token                   = jwt_encode_handler(new_payload)
         return self.token_response(token, user, request)
 
+class DisconnectUserKroneroJSONWebToken(APIView, CustomTokenVerify):
+    # Disconnect the user kronero
+    def post(self, request, *args, **kwargs):
+        token   = self.get_token_from_request(request)
+        payload = self._check_payload(token=token)
+        user    = self._check_userkronero(payload=payload)
+        if hasattr(user, 'email'):
+            StateUserKronero().disconnect(user.email)
+        return self.token_response(token, user, request)
 
 obtain_jwt_token_kronero    = ObtainUserKroneroJSONWebToken.as_view()
 refresh_jwt_token_kronero   = RefreshUserKroneroJSONWebToken.as_view()
 verify_jwt_token_kronero    = VerifyUserKroneroJSONWebToken.as_view()
+disconnect_user_kronero     = DisconnectUserKroneroJSONWebToken.as_view()
 
 #ADMINISTRATORS
 
