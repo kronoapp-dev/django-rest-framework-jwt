@@ -427,20 +427,9 @@ class RefreshUserKroneroJSONWebToken(APIView,CustomTokenVerify):
         token                   = jwt_encode_handler(new_payload)
         return self.token_response(token, user, request)
 
-class DisconnectUserKroneroJSONWebToken(APIView, CustomTokenVerify):
-    # Disconnect the user kronero
-    def post(self, request, *args, **kwargs):
-        token   = self.get_token_from_request(request)
-        payload = self._check_payload(token=token)
-        user    = self._check_userkronero(payload=payload)
-        if hasattr(user, 'email'):
-            StateUserKronero().disconnect(user.email)
-        return self.token_response(token, user, request)
-
 obtain_jwt_token_kronero    = ObtainUserKroneroJSONWebToken.as_view()
 refresh_jwt_token_kronero   = RefreshUserKroneroJSONWebToken.as_view()
 verify_jwt_token_kronero    = VerifyUserKroneroJSONWebToken.as_view()
-disconnect_user_kronero     = DisconnectUserKroneroJSONWebToken.as_view()
 
 #ADMINISTRATORS
 
